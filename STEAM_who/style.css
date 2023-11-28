@@ -1,0 +1,18 @@
+#characters-grid {
+  display: flex;
+  flex-wrap: wrap;
+  border: 2px solid black;
+}
+#character-cell {
+  width: 300px;
+  height: 600px;
+  border: 2px solid black;
+}
+#character-img {
+  width: 300px;
+  height: 350px;
+}
+
+
+
+
