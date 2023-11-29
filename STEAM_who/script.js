@@ -17,10 +17,10 @@ class Characters_class {
 
 let id_c = 0;
 let charactersList = [];
-let pointsList = [];
 
 // creo gli oggetti (persone) della classe Characters_class
-let Albert_Einstein = new Characters_class(["scienza", "matematica"], "Albert", "Einstein", "img/Albert_Einstein.jpg", "Albert Einstein  Grande fisico del XIX e XX", [true]);
+let Albert_Einstein = new Characters_class(["scienza", "matematica"], "Albert", "Einstein", "img/Albert_Einstein.jpg", "Albert Einstein  Grande fisico del XIX e XX", [false, true, false, true, true, false, true, true, true, false, true, false, false, true,
+  true, false, true, false, false, false]);
 let Marie_Curie = new Characters_class(["scienza"], "Marie", "Curie", "img/Marie_Curie.jpg", "Marie Curie  Prima donna premio insignita del premio Nobel", [false]);
 let Charles_Darwin = new Characters_class(["scienza"], "Charles", "Darwin", "img/Charles_Darwin.jpg", "Charles Darwin  Quello dell'evoluzione delle specie", [true]);
 let Stephen_Hawking = new Characters_class(["scienza", "matematica"], "Stephen", "Hawking", "img/Stephen_Hawking.jpg", "Stephen Hawking  Astrofisico dei nostri anni", [true]);
@@ -72,31 +72,56 @@ function delete_characters_grid() {
 
 
 const charactersGrid = document.getElementById("characters-grid");
-const form = document.getElementById("question-form");
-const QUESTIONS = [
-  "Il tuo personaggio è vivo?",
-  "Il tuo personaggio è vissuto nel XIX secolo?",
-  "Il tuo personaggio è noto per aver lavorato in Italia?",
-  "Il tuo personaggio ha contribuito al progresso scientifico?", 
-  "Il tuo personaggio è nato in Europa?",
-  "Il tuo personaggio è mai stato milionario?",
-  "Il tuo personaggio ha mai scritto un libro?",
-  "Il tuo personaggio è stato premiato con un Nobel?",
-  "Il tuo personaggio è famoso per aver fatto delle scoperte?",
-  "Il tuo personaggio è l'autore di opere artistiche conosciute in tutto il mondo?"
+const questionForm = document.getElementById("question");
+const btnForm = document.getElementById("question-form");
+const result = document.getElementById("result");
+const readyBtn = document.getElementById("ready-btn");
+const resetBtn = document.getElementById("reset-btn");
+resetBtn.disabled = true;
 
+const QUESTIONS = [
+1  "Il tuo personaggio è ancora vivo?",
+2  "Il tuo personaggio è vissuto nel XIX secolo?",
+3  "Il tuo personaggio è noto per aver lavorato in Italia?",
+4  "Il tuo personaggio ha contribuito al progresso scientifico o matematico?", 
+5  "Il tuo personaggio è nato in Europa?",
+6  "Il tuo personaggio è mai stato miliardario?",
+7  "Il tuo personaggio ha mai scritto un libro di qualsiasi tipo?",
+8  "Il tuo personaggio è stato premiato con un Nobel?",
+9  "Il tuo personaggio è famoso per aver fatto delle scoperte?",
+10  "Il tuo personaggio è noto per le sue opere artistiche?",
+11  "Il tuo personaggio è un uomo?",
+12  "Il tuo personaggio è un pioniere del campo della medicina?",
+13  "Il tuo personaggio è nato in Nord America?",
+14  "Il tuo personaggio ha ispirato la scrittura di opere letterarie, cinematografiche o simili?",
+15  "Il tuo personaggio ha vissuto più di 40 anni? (NO se ignoto)",
+16  "Il tuo personaggio è religioso?",
+17  "Il tuo personaggio è vissuto dopo la nascita di Cristo?",
+18  "Il tuo personaggio ha a che fare con la tecnologia?",
+19  "Il tuo personaggio ha mai combattuto guerre?",
+20  "Il tuo personaggio è vissuto nel XVI secolo?"
 ];
 const QUESTIONS_TO_ASK = 20;
-// creo una mappa i:domanda per non fare domande già chieste
+// creo un array con le domande mischiate
+// così da eliminare le domande già poste
 let newQuest = shuffle(QUESTIONS.slice());
-//newQuest = shuffle(newQuest);
-let answer;
 let questionIndex;
+let answer;
 let nOfQuestionsMade = 0;
 
+// riportare giù
+function reset_game() {
+  for (let i=0; i<charactersList.length; i++) {
+    charactersList[i].punti = 0;
+  }
+  newQuest = shuffle(QUESTIONS.slice());
+  answer = null;
+  nOfQuestionsMade = 0;
 
+  resetBtn.disabled = true;
+}
 
-// MODIFICARE
+// mischio le domande
 function shuffle(q) {
   for (let i=q.length-1; i>0; i--) {
     let x = Math.floor(Math.random() * i + 1);
@@ -104,18 +129,17 @@ function shuffle(q) {
   }
   return q;
 }
-
+btnForm
+// creo la sezione domande nell'HTML
 function set_question() {
+  readyBtn.disabled = true;
   delete_form();
-  // prendo l'indice di una domanda nuova
-  // IN QUESTO MODO POSSONO ESSERCI DOMANDE CON INDICI CHE NON ESISTONO
-  questionIndex = QUESTIONS.indexOf(newQuest[0])
   // scrivo la domanda
-  document.getElementById("question").innerHTML = newQuest[0];
-
+  questionIndex = QUESTIONS.indexOf(newQuest[0])
+  questionForm.innerHTML = newQuest[0];
   // setto i radio button
   value = "Sì";
-  for (let j=0; j<2; j++) {
+  for (let i=0; i<2; i++) {
     const radio = document.createElement("input");
     radio.type = "radio";
     radio.name = "answer";
@@ -126,32 +150,33 @@ function set_question() {
     label.innerHTML = value;
     label.htmlFor = value;
 
-    form.appendChild(radio);
-    form.appendChild(label);
+    btnForm.appendChild(radio);
+    btnForm.appendChild(label);
     value = "No";
   }
-
   // assegno eventi ai radio button
   // seleziono i radio button
   var radioButtons = document.getElementsByName("answer");
   // assegno la funzione per gestire l'evento change dei radio button
-  radioButtons.forEach(function(r) {
-    r.addEventListener('change', handle_click);
+  radioButtons.forEach(function(e) {
+    e.addEventListener('change', handle_answer_click);
   });
 }
 
 function delete_form() {
-  while (form.firstChild) {
-    form.removeChild(form.lastChild);
+  questionForm.innerHTML = "";
+  while (btnForm.firstChild) {
+    btnForm.removeChild(btnForm.lastChild);
   }
 }
-// gestisco il click dei bottoni
-function handle_click(event) {
+
+// gestisco il click dei bottoni delle risposte
+function handle_answer_click(event) {
   // event.target seleziona l'elemento sottoposto a change
   let btn = event.target;
   // PROVARE a TOGLIERE il blocco IF dopo!!!
   if (btn.checked) {
-    answer = btn.value == "Sì";
+    answer = btn.value === "Sì";
     check_answer();
   }
 }
@@ -160,40 +185,38 @@ function handle_click(event) {
 function check_answer() {
   for (let i=0; i<charactersList.length; i++) {
     // CAMBIARE INDICE RISPOSTE QUANDO LE AVRò FINITE!!!
-    if (charactersList[i].risposte[0] == answer) {
+    if (charactersList[i].risposte[questionIndex] === answer) {
       charactersList[i].punti++;
     }
   }
   newQuest = newQuest.slice(1);
   nOfQuestionsMade++;
   guess();
-  set_question();
 }
 
-// provo a vedere se posso indovinare
-/* provo a indovinare dopo ogni risposta utilizzando 
-un'equazione che mi assicuri che il personaggio con più punti 
-non possa essere superato entro le domande rimanenti (20 in totale) 
-dal secondo personaggio con più punti, neanche nell’ipotesi in cui 
-il primo non guadagni più punti e il secondo li guadagni sempre */
+// constorllo se è necessario fare altre domande altrimenti indovino
 function guess() {
   let dr = QUESTIONS_TO_ASK - nOfQuestionsMade;
-  let [idx1, idx2] = max2scores();
+  let [idx1, idx2] = get_max2scores();
   if (charactersList[idx1].punti >= charactersList[idx2].punti + dr) {
-    // MOSTRARE A SCHERMO IL VINCITORE
-    console.log("Il tuo personaggio era... ${charactersList[idx1].nome} ${charactersList[idx1].cognome}!");
-    resetGame();
+    // MOSTRARE A SCHERMO IL RISULTATO
+    // show_result()
+    result.innerHTML = `Il tuo personaggio era... ${charactersList[idx1].nome} ${charactersList[idx1].cognome}!`;
+    delete_form();
+    resetBtn.disabled = false;
+  } else {
+    set_question();
   }
 }
 
 // ritorno gli indici dei 2 personaggi con più punti
-function max2scores() {
+function get_max2scores() {
   // indice 1° personaggio x punti
   let idx1 = charactersList[0].punti >= charactersList[1].punti ? 0 : 1;
   // indice 2° personaggio x punti
-  let idx2 = idx1 == 0 ? 1 : 0;
+  let idx2 = idx1 === 0 ? 1 : 0;
 
-  for (let i=3; i<charactersList.length; i++) {
+  for (let i=2; i<charactersList.length; i++) {
     if (charactersList[i].punti > charactersList[idx1].punti) {
       idx2 = idx1;
       idx1 = i;
@@ -206,9 +229,6 @@ function max2scores() {
 }
 
 // resetto tutte le variabili di gioco
-function resetGame() {
-  // DA FARE
-}
 
 
 

@@ -13,14 +13,16 @@
   <div id="characters-grid"></div>
   <button onclick="create_characters_grid()">crea griglia</button>
   <button onclick="delete_characters_grid()">elimina griglia</button>
-  <button onclick="set_question()">Pronto!</button>
+  <button id="ready-btn" onclick="set_question()">Pronto!</button>
   <!-- Form con il quiz -->
   <div id="quiz">
     <p id="question"></p>
-    <form id="question-form">
-      
+    <form id="question-form">     
     </form>
   </div>
+  <div id="result"></div>
+  <button id="reset-btn" onclick="reset_game()">Resetta partita</button>
+
   <script src="script.js"></script>
 </body>
 </html>
